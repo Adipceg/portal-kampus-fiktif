@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIAKAD Fiktif - Portal Kampus Latihan Keamanan Web</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --success: #16a34a;
+      --header-bg: #0f172a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Security banner */
+    .sec-notice {
+      background: #fef3c7; color: #92400e; padding: 10px 16px; font-size: 13px; text-align: center;
+      border-bottom: 1px solid #fde68a; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .sec-badge { background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+
+    /* Navbar */
+    header { background: var(--header-bg); color: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+    .brand span { color: #60a5fa; }
+    .nav-user { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+    .role-pill { background: #334155; padding: 4px 10px; border-radius: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Main Container */
+    main { max-width: 1100px; width: 100%; margin: 24px auto; padding: 0 16px; flex: 1; }
+    
+    /* Login Box */
+    .login-container { max-width: 480px; margin: 40px auto; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .login-container h2 { font-size: 22px; margin-bottom: 6px; color: var(--header-bg); }
+    .login-container p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    input[type="text"], input[type="password"], textarea, select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); ring: 2px solid #bfdbfe; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f1f5f9; }
+
+    /* Quick Login Cards */
+    .quick-logins { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border); }
+    .quick-logins p { font-size: 12px; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
+    .quick-btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .quick-btn { background: #f8fafc; border: 1px solid var(--border); padding: 8px 4px; border-radius: 6px; font-size: 11px; cursor: pointer; text-align: center; }
+    .quick-btn:hover { background: #e2e8f0; }
+
+    /* Dashboard Navigation Tabs */
+    .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; overflow-x: auto; }
+    .tab { padding: 10px 16px; border: none; background: none; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* Cards & Panels */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    .card-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .vuln-tag { font-size: 11px; background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; border: 1px solid #fecaca; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { background: #f8fafc; text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border); font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
+    td { padding: 12px; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: #f8fafc; }
+
+    /* Discussion Forum */
+    .forum-post { padding: 14px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; background: #fff; }
+    .forum-post-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .forum-post-body { font-size: 14px; line-height: 1.5; }
+
+    /* Footer Info */
+    footer { background: white; border-top: 1px solid var(--border); padding: 16px 24px; font-size: 12px; color: var(--text-muted); text-align: center; margin-top: auto; }
+    .vulnerability-doc { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 16px; margin-top: 24px; font-size: 13px; line-height: 1.6; }
+    .vulnerability-doc h4 { color: #b45309; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+  <!-- PEMBERITAHUAN LATIHAN KEAMANAN -->
+  <div class="sec-notice">
+    <span class="sec-badge">DUMMY PRAKTIKUM</span>
+    Portal Kampus Fiktif (Data Sintetis). Dibuat untuk pengujian kerentanan keamanan web.
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      🎓 SIAKAD<span>KAMPUS</span>
+    </div>
+    <div class="nav-user" id="navUserArea">
+      <span id="userInfoText">Belum Masuk</span>
+      <button class="btn btn-sm btn-outline" style="color:white; border-color:#475569;" id="logoutBtn" onclick="handleLogout()" style="display:none;">Keluar</button>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA -->
+  <main id="appContainer">
+    <!-- View akan dirender dinamis via JavaScript -->
+  </main>
+
+  <!-- DOKUMENTASI KERENTANAN DI FOOTER -->
+  <main style="margin-top:0;">
+    <div class="vulnerability-doc">
+      <h4>🔍 Informasi Kerentanan Yang Ditanam Secara Sengaja:</h4>
+      <ul>
+        <li><strong>1. Stored XSS (Cross-Site Scripting):</strong> Pada menu <em>Forum Diskusi</em>, input pesan pengguna disimpan dan dirender langsung menggunakan <code>innerHTML</code> tanpa sanitasi. Coba kirim: <code>&lt;b style="color:red"&gt;XSS Alert&lt;/b&gt; &lt;img src=x onerror="alert('Stored XSS Berhasil!')"&gt;</code>.</li>
+        <li><strong>2. Validasi Berkas Lemah (Unrestricted File Upload):</strong> Pada menu <em>Unggah Tugas</em>, form mengizinkan berkas apapun tanpa filter ekstensi (misal: <code>.php</code>, <code>.html</code>, <code>.exe</code>, <code>.sh</code>) dan nama berkas ditampilkan langsung.</li>
+        <li><strong>3. IDOR / Kontrol Akses Lemah:</strong> Pada menu <em>Lihat Nilai</em>, mahasiswa dapat melihat transkrip nilai mahasiswa lain cukup dengan mengganti parameter ID Mahasiswa tanpa verifikasi otorisasi sesi.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    Portal Kampus Fiktif untuk Tugas Praktikum Keamanan Web &copy; 2026. Data sintetis sepenuhnya.
+  </footer>
+
+  <script>
+    // ==========================================
+    // DATA AWAL SINTETIS (MOCK DATABASE)
+    // ==========================================
+    const DEFAULT_DATA = {
+      users: [
+        { id: "M01", username: "mhs_budi", password: "123", role: "mahasiswa", name: "Budi Santoso", npm: "24781032", prodi: "Teknik Informatika" },
+        { id: "M02", username: "mhs_siti", password: "123", role: "mahasiswa", name: "Siti Aminah", npm: "24781055", prodi: "Sistem Informasi" },
+        { id: "D01", username: "dosen_irwan", password: "123", role: "dosen", name: "Dr. Irwan Setiawan, M.Kom", nidn: "0412058001" },
+        { id: "A01", username: "admin", password: "123", role: "admin", name: "Administrator Kampus" }
+      ],
+      grades: [
+        { studentId: "M01", course: "Keamanan Sistem & Jaringan", sks: 3, score: 88, grade: "A" },
+        { studentId: "M01", course: "Pemrograman Web Lanjut", sks: 3, score: 78, grade: "B+" },
+        { studentId: "M01", course: "Kriptografi Terapan", sks: 2, score: 85, grade: "A" },
+        { studentId: "M02", course: "Keamanan Sistem & Jaringan", sks: 3, score: 62, grade: "C" },
+        { studentId: "M02", course: "Basis Data Spasial", sks: 3, score: 92, grade: "A" }
+      ],
+      assignments: [
+        { id: 1, studentId: "M01", studentName: "Budi Santoso", title: "Laporan Audit Keamanan P06", filename: "laporan_audit.pdf", date: "2026-10-10", score: 85 },
+        { id: 2, studentId: "M02", studentName: "Siti Aminah", title: "Praktikum Exploit XSS", filename: "shell_exploit.html", date: "2026-10-11", score: null }
+      ],
+      discussions: [
+        { id: 1, author: "Dr. Irwan Setiawan", role: "dosen", text: "Selamat datang di portal kampus. Silakan kumpulkan tugas praktikum sebelum tenggat waktu.", time: "10 Okt 2026, 09:00" },
+        { id: 2, author: "Budi Santoso", role: "mahasiswa", text: "Pak, apakah format laporan harus PDF atau boleh format arsip lain?", time: "10 Okt 2026, 10:15" }
+      ]
+    };
+
+    function getDB() {
+      const data = localStorage.getItem("kampus_db");
+      if (!data) {
+        localStorage.setItem("kampus_db", JSON.stringify(DEFAULT_DATA));
+        return DEFAULT_DATA;
+      }
+      return JSON.parse(data);
+    }
+
+    function saveDB(data) {
+      localStorage.setItem("kampus_db", JSON.stringify(data));
+    }
+
+    function getCurrentUser() {
+      const u = sessionStorage.getItem("current_user");
+      return u ? JSON.parse(u) : null;
+    }
+
+    function setCurrentUser(u) {
+      if (u) sessionStorage.setItem("current_user", JSON.stringify(u));
+      else sessionStorage.removeItem("current_user");
+    }
+
+    // ==========================================
+    // RENDER UTAMA SESUAI STATUS LOGIN
+    // ==========================================
+    function renderApp() {
+      const user = getCurrentUser();
+      const navArea = document.getElementById("navUserArea");
+      const appContainer = document.getElementById("appContainer");
+
+      if (!user) {
+        navArea.innerHTML = `<span>Silakan Masuk</span>`;
+        renderLoginView(appContainer);
+      } else {
+        navArea.innerHTML = `
+          <div><strong>${user.name}</strong> <span class="role-pill">${user.role}</span></div>
+          <button class="btn btn-sm btn-outline" style="color:white; border-color:#475569;" onclick="handleLogout()">Keluar</button>
+        `;
+        if (user.role === "mahasiswa") renderMahasiswaView(appContainer, user);
+        else if (user.role === "dosen") renderDosenView(appContainer, user);
+        else if (user.role === "admin") renderAdminView(appContainer, user);
+      }
+    }
+
+    // ==========================================
+    // 1. VIEW LOGIN
+    // ==========================================
+    function renderLoginView(container) {
+      container.innerHTML = `
+        <div class="login-container">
+          <h2>Masuk ke Portal Kampus</h2>
+          <p>Gunakan akun sintetis mahasiswa, dosen, atau admin.</p>
+          
+          <form onsubmit="handleLoginSubmit(event)">
+            <div class="form-group">
+              <label>Nama Pengguna (Username)</label>
+              <input type="text" id="loginUsername" placeholder="Contoh: mhs_budi" required>
+            </div>
+            <div class="form-group">
+              <label>Kata Sandi (Password)</label>
+              <input type="password" id="loginPassword" placeholder="Masukkan sandi" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Masuk</button>
+          </form>
+
+          <div class="quick-logins">
+            <p>Akses Cepat 1-Klik (Data Sintetis):</p>
+            <div class="quick-btn-grid">
+              <button class="quick-btn" onclick="quickLogin('mhs_budi')">👨‍🎓 Mahasiswa<br><strong>Budi</strong></button>
+              <button class="quick-btn" onclick="quickLogin('dosen_irwan')">👨‍🏫 Dosen<br><strong>Dr. Irwan</strong></button>
+              <button class="quick-btn" onclick="quickLogin('admin')">⚙️ Admin<br><strong>Pengelola</strong></button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const u = document.getElementById("loginUsername").value.trim();
+      const p = document.getElementById("loginPassword").value.trim();
+      quickLogin(u, p);
+    }
+
+    function quickLogin(username, password = "123") {
+      const db = getDB();
+      const user = db.users.find(x => x.username.toLowerCase() === username.toLowerCase());
+      if (user && (user.password === password || password === "123")) {
+        setCurrentUser(user);
+        renderApp();
+      } else {
+        alert("Username atau kata sandi tidak ditemukan pada data sintetis.");
+      }
+    }
+
+    function handleLogout() {
+      setCurrentUser(null);
+      renderApp();
+    }
+
+    // ==========================================
+    // 2. VIEW MAHASISWA (NILAI, TUGAS, FORUM)
+    // ==========================================
+    let activeMhsTab = "nilai";
+
+    function renderMahasiswaView(container, user) {
+      container.innerHTML = `
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h2 style="font-size:20px;">Selamat datang, ${user.name}</h2>
+              <p style="color:var(--text-muted); font-size:14px;">NPM: ${user.npm} | Program Studi: ${user.prodi}</p>
+            </div>
+            <span class="role-pill" style="background:#e0f2fe; color:#0369a1;">Akun Mahasiswa</span>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab ${activeMhsTab==='nilai'?'active':''}" onclick="setMhsTab('nilai')">📊 Lihat Nilai (IDOR Demo)</button>
+          <button class="tab ${activeMhsTab==='tugas'?'active':''}" onclick="setMhsTab('tugas')">📁 Unggah Tugas (File Upload Demo)</button>
+          <button class="tab ${activeMhsTab==='forum'?'active':''}" onclick="setMhsTab('forum')">💬 Forum Diskusi (Stored XSS Demo)</button>
+        </div>
+
+        <div id="mhsTabContent"></div>
+      `;
+      renderMhsTabContent(user);
+    }
+
+    function setMhsTab(tab) {
+      activeMhsTab = tab;
+      const user = getCurrentUser();
+      renderMahasiswaView(document.getElementById("appContainer"), user);
+    }
+
+    function renderMhsTabContent(user) {
+      const content = document.getElementById("mhsTabContent");
+      const db = getDB();
+
+      if (activeMhsTab === 'nilai') {
+        // IDOR: Mahasiswa bisa mengganti studentId ke ID mahasiswa lain!
+        const currentTargetId = window.idorTargetStudentId || user.id;
+        const targetStudent = db.users.find(u => u.id === currentTargetId) || user;
+        const studentGrades = db.grades.filter(g => g.studentId === currentTargetId);
+
+        content.innerHTML = `
+          <div class="card">
+            <div class="card-title">
+              <span>Kartu Hasil Studi (KHS) - ${targetStudent.name} (${targetStudent.npm || '-'})</span>
+              <span class="vuln-tag">⚠️ Kerentanan: IDOR (Insecure Direct Object Reference)</span>
+            </div>
+
+            <div style="background:#f1f5f9; padding:12px; border-radius:6px; margin-bottom:16px; font-size:13px;">
+              <strong>Uji Coba Kerentanan IDOR:</strong> Nilai ditampilkan berdasarkan parameter <code>studentId</code> tanpa validasi kepemilikan sesi.
+              <br>Ganti ID Mahasiswa untuk melihat nilai mahasiswa lain:
+              <select style="width:auto; margin-left:8px; padding:4px 8px;" onchange="switchIdorStudent(this.value)">
+                ${db.users.filter(u=>u.role==='mahasiswa').map(m => `
+                  <option value="${m.id}" ${m.id === currentTargetId ? 'selected':''}>${m.name} (${m.id})</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Mata Kuliah</th>
+                  <th>SKS</th>
+                  <th>Nilai Angka</th>
+                  <th>Nilai Huruf</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${studentGrades.map(g => `
+                  <tr>
+                    <td><strong>${g.course}</strong></td>
+                    <td>${g.sks}</td>
+                    <td>${g.score}</td>
+                    <td><span style="font-weight:bold; color:var(--primary);">${g.grade}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } 
+      else if (activeMhsTab === 'tugas') {
+        // FILE UPLOAD LEMAH
+        const myAssignments = db.assignments.filter(a => a.studentId === user.id);
+
+        content.innerHTML = `
+          <div class="card">
+            <div class="card-title">
+              <span>Unggah Berkas Tugas Mahasiswa</span>
+              <span class="vuln-tag">⚠️ Kerentanan: Validasi Berkas Lemah (Unrestricted Upload)</span>
+            </div>
+            
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+              Kumpulkan tugas kuliah Anda di bawah ini. (Fitur ini secara sengaja tidak memeriksa ekstensi berkas, sehingga berkas seperti <code>.html</code>, <code>.php</code>, <code>.sh</code> dapat lolos diunggah).
+            </p>
+
+            <form onsubmit="handleUploadAssignment(event)" style="margin-bottom:24px; background:#f8fafc; padding:16px; border-radius:8px; border:1px solid var(--border);">
+              <div class="form-group">
+                <label>Judul Tugas</label>
+                <input type="text" id="taskTitle" placeholder="Misal: Tugas Eksploitasi Keamanan Web" required>
+              </div>
+              <div class="form-group">
+                <label>Pilih Berkas (Semua format diterima tanpa validasi server/klien)</label>
+                <input type="file" id="taskFile" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:auto;">Unggah Tugas</button>
+            </form>
+
+            <h4 style="font-size:15px; margin-bottom:12px;">Daftar Tugas Yang Telah Diunggah:</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Judul Tugas</th>
+                  <th>Nama Berkas</th>
+                  <th>Tanggal</th>
+                  <th>Nilai Dosen</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${myAssignments.length === 0 ? '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Belum ada tugas yang diunggah.</td></tr>' : ''}
+                ${myAssignments.map(a => `
+                  <tr>
+                    <td><strong>${a.title}</strong></td>
+                    <td><code>${a.filename}</code></td>
+                    <td>${a.date}</td>
+                    <td>${a.score !== null ? '<span style="color:var(--success); font-weight:bold;">'+a.score+'</span>' : '<span style="color:var(--warning);">Belum Dinilai</span>'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } 
+      else if (activeMhsTab === 'forum') {
+        // STORED XSS
+        content.innerHTML = `
+          <div class="card">
+            <div class="card-title">
+              <span>Forum Diskusi Kampus</span>
+              <span class="vuln-tag">⚠️ Kerentanan: Stored XSS (Cross-Site Scripting)</span>
+            </div>
+
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+              Kirim pertanyaan atau diskusi. <strong>Kerentanan:</strong> Pesan disimpan dan ditampilkan menggunakan <code>innerHTML</code> tanpa penyaringan/escape karakter HTML.
+            </p>
+
+            <div style="background:#fef2f2; border:1px solid #fee2e2; padding:12px; border-radius:6px; margin-bottom:16px; font-size:12px;">
+              <strong>Payload Uji XSS Siap Pakai:</strong><br>
+              <code>&lt;b style="color:red; font-size:16px;"&gt;[XSS Berhasil Dijalankan]&lt;/b&gt; &lt;img src=x onerror="alert('Stored XSS Ditemukan!')"&gt;</code>
+              <br><button class="btn btn-sm btn-outline" style="margin-top:6px;" onclick="insertXssPayload()">Isi Payload Otomatis</button>
+            </div>
+
+            <form onsubmit="handleSendForumPost(event)" style="margin-bottom:24px;">
+              <div class="form-group">
+                <textarea id="forumInput" rows="3" placeholder="Tuliskan pesan diskusi Anda di sini..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:auto;">Kirim ke Forum</button>
+            </form>
+
+            <h4 style="font-size:15px; margin-bottom:12px;">Diskusi Terbaru:</h4>
+            <div id="forumPostsContainer"></div>
+          </div>
+        `;
+        renderForumPosts();
+      }
+    }
+
+    function switchIdorStudent(studentId) {
+      window.idorTargetStudentId = studentId;
+      const user = getCurrentUser();
+      renderMhsTabContent(user);
+    }
+
+    function handleUploadAssignment(e) {
+      e.preventDefault();
+      const title = document.getElementById("taskTitle").value.trim();
+      const fileInput = document.getElementById("taskFile");
+      const filename = fileInput.files[0] ? fileInput.files[0].name : "tugas_tanpa_nama.ext";
+      
+      const db = getDB();
+      const user = getCurrentUser();
+      db.assignments.push({
+        id: Date.now(),
+        studentId: user.id,
+        studentName: user.name,
+        title: title,
+        filename: filename,
+        date: new Date().toISOString().split('T')[0],
+        score: null
+      });
+      saveDB(db);
+      alert(`Tugas berhasil diunggah!\nNama berkas: ${filename}\n(Berkas diterima tanpa pengecekan tipe/ekstensi).`);
+      renderMhsTabContent(user);
+    }
+
+    function insertXssPayload() {
+      document.getElementById("forumInput").value = `<b style="color:red; font-size:16px;">[XSS Berhasil Dijalankan]</b> <img src=x onerror="alert('Stored XSS Ditemukan!')">`;
+    }
+
+    function handleSendForumPost(e) {
+      e.preventDefault();
+      const text = document.getElementById("forumInput").value;
+      const user = getCurrentUser();
+      const db = getDB();
+
+      db.discussions.push({
+        id: Date.now(),
+        author: user.name,
+        role: user.role,
+        text: text, // DISIMPAN APA ADANYA TANPA SANITASI
+        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute:'2-digit' }) + ', Hari ini'
+      });
+      saveDB(db);
+      document.getElementById("forumInput").value = "";
+      renderForumPosts();
+    }
+
+    function renderForumPosts() {
+      const container = document.getElementById("forumPostsContainer");
+      if (!container) return;
+      const db = getDB();
+      
+      container.innerHTML = "";
+      db.discussions.slice().reverse().forEach(post => {
+        const postEl = document.createElement("div");
+        postEl.className = "forum-post";
+        
+        // KERENTANAN STORED XSS: Menggunakan innerHTML langsung untuk me-render post.text!
+        postEl.innerHTML = `
+          <div class="forum-post-header">
+            <strong>${post.author} (${post.role})</strong>
+            <span>${post.time}</span>
+          </div>
+          <div class="forum-post-body">${post.text}</div>
+        `;
+        container.appendChild(postEl);
+      });
+    }
+
+    // ==========================================
+    // 3. VIEW DOSEN (PENILAIAN TUGAS)
+    // ==========================================
+    function renderDosenView(container, user) {
+      const db = getDB();
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-title">
+            <div>
+              <h2 style="font-size:20px;">Portal Dosen - ${user.name}</h2>
+              <p style="color:var(--text-muted); font-size:14px; font-weight:normal;">NIDN: ${user.nidn}</p>
+            </div>
+            <span class="role-pill" style="background:#fef3c7; color:#92400e;">Akun Dosen</span>
+          </div>
+
+          <h3 style="font-size:16px; margin:20px 0 12px 0;">Daftar Tugas Mahasiswa Yang Masuk:</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Nama Mahasiswa</th>
+                <th>Judul Tugas</th>
+                <th>Berkas Yang Diunggah</th>
+                <th>Tanggal</th>
+                <th>Nilai Saat Ini</th>
+                <th>Aksi Penilaian</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${db.assignments.map(a => `
+                <tr>
+                  <td><strong>${a.studentName}</strong></td>
+                  <td>${a.title}</td>
+                  <td><code>${a.filename}</code></td>
+                  <td>${a.date}</td>
+                  <td>${a.score !== null ? '<span style="color:var(--success); font-weight:bold;">'+a.score+'</span>' : '<span style="color:var(--warning);">Belum Dinilai</span>'}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline" onclick="promptGradeAssignment(${a.id})">Beri Nilai</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function promptGradeAssignment(assignmentId) {
+      const db = getDB();
+      const a = db.assignments.find(x => x.id === assignmentId);
+      if (!a) return;
+      const input = prompt(`Masukkan nilai untuk tugas "${a.title}" dari ${a.studentName} (0 - 100):`, a.score || 85);
+      if (input !== null) {
+        const val = parseInt(input, 10);
+        if (!isNaN(val) && val >= 0 && val <= 100) {
+          a.score = val;
+          saveDB(db);
+          alert("Nilai berhasil disimpan!");
+          renderDosenView(document.getElementById("appContainer"), getCurrentUser());
+        } else {
+          alert("Nilai harus berupa angka antara 0 sampai 100.");
+        }
+      }
+    }
+
+    // ==========================================
+    // 4. VIEW ADMIN (PENGELOLA AKUN)
+    // ==========================================
+    function renderAdminView(container, user) {
+      const db = getDB();
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-title">
+            <div>
+              <h2 style="font-size:20px;">Portal Administrator Kampus</h2>
+              <p style="color:var(--text-muted); font-size:14px; font-weight:normal;">Pengelolaan Akun & Data Sintetis</p>
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="resetDatabase()">Reset Database Default</button>
+          </div>
+
+          <h3 style="font-size:16px; margin:20px 0 12px 0;">Daftar Akun Pengguna:</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Username</th>
+                <th>Peran (Role)</th>
+                <th>NPM / NIDN</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${db.users.map(u => `
+                <tr>
+                  <td><code>${u.id}</code></td>
+                  <td><strong>${u.name}</strong></td>
+                  <td>${u.username}</td>
+                  <td><span class="role-pill">${u.role}</span></td>
+                  <td>${u.npm || u.nidn || '-'}</td>
+                  <td>
+                    ${u.role !== 'admin' ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">Hapus</button>` : '<span style="color:var(--text-muted); font-size:12px;">Admin Utama</span>'}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border);">
+            <h4 style="font-size:15px; margin-bottom:12px;">Tambah Akun Sintetis Baru:</h4>
+            <form onsubmit="handleCreateUser(event)" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)) 100px; gap:8px;">
+              <input type="text" id="newUserName" placeholder="Nama Lengkap" required>
+              <input type="text" id="newUserUsername" placeholder="Username" required>
+              <input type="password" id="newUserPassword" placeholder="Password" required>
+              <select id="newUserRole">
+                <option value="mahasiswa">Mahasiswa</option>
+                <option value="dosen">Dosen</option>
+              </select>
+              <button type="submit" class="btn btn-primary" style="height:40px;">Tambah</button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleCreateUser(e) {
+      e.preventDefault();
+      const name = document.getElementById("newUserName").value.trim();
+      const username = document.getElementById("newUserUsername").value.trim();
+      const password = document.getElementById("newUserPassword").value.trim();
+      const role = document.getElementById("newUserRole").value;
+
+      const db = getDB();
+      const newId = (role === 'mahasiswa' ? 'M' : 'D') + String(db.users.length + 1).padStart(2, '0');
+      db.users.push({
+        id: newId,
+        username,
+        password,
+        role,
+        name,
+        npm: role === 'mahasiswa' ? '2478' + Math.floor(1000 + Math.random() * 9000) : undefined,
+        nidn: role === 'dosen' ? '04' + Math.floor(10000000 + Math.random() * 90000000) : undefined
+      });
+      saveDB(db);
+      alert(`Akun ${name} (${role}) berhasil ditambahkan!`);
+      renderAdminView(document.getElementById("appContainer"), getCurrentUser());
+    }
+
+    function deleteUser(userId) {
+      if (!confirm("Apakah Anda yakin ingin menghapus akun ini?")) return;
+      const db = getDB();
+      db.users = db.users.filter(u => u.id !== userId);
+      saveDB(db);
+      renderAdminView(document.getElementById("appContainer"), getCurrentUser());
+    }
+
+    function resetDatabase() {
+      if (confirm("Reset seluruh data ke kondisi awal sintetis?")) {
+        localStorage.removeItem("kampus_db");
+        alert("Database telah di-reset ke data sintetis awal.");
+        renderApp();
+      }
+    }
+
+    // Inisialisasi awal
+    renderApp();
+  </script>
+</body>
+</html>
